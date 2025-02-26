@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Hindu News</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #121212;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header, footer {
+            background: #1f1f1f;
+            padding: 1rem;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2rem;
+            margin: 0;
+        }
+        .container {
+            flex: 1;
+            padding: 2rem;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background: #1e1e1e;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        li img {
+            width: 100px;
+            height: auto;
+            border-radius: 8px;
+        }
+        a {
+            color: #1e90ff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .weather {
+            text-align: right;
+            padding: 1rem;
+        }
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            li {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            li img {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>The Hindu News</h1>
+        <div class="weather" id="weather">Loading weather...</div>
+    </header>
+    <div class="container">
+        <ul>
+            {% for title, link, img_url in news %}
+                <li>
+                    <img src="{{ img_url }}" alt="News Image">
+                    <a href="{{ link }}" target="_blank">{{ title }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <footer>
+        <p>&copy; 2025 The Hindu News Scraper. All rights reserved.</p>
+    </footer>
+    <script>
+        async function fetchWeather() {
+            try {
+                const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=28.7041&longitude=77.1025&current_weather=true');
+                const data = await response.json();
+                document.getElementById('weather').textContent = `Weather: ${data.current_weather.temperature}°C, ${data.current_weather.weathercode}`;
+            } catch (error) {
+                document.getElementById('weather').textContent = 'Weather data unavailable';
+            }
+        }
+        fetchWeather();
+    </script>
+</body>
+</html>
