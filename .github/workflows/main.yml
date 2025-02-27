@@ -1,0 +1,38 @@
+name: Scrape News Daily
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs every day at midnight UTC
+  workflow_dispatch: # Allows manual runs
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r hindu-news-app/requirements.txt
+
+      - name: Run scrapper
+        run: |
+          cd hindu-news-app
+          python scrapper.py
+
+      - name: Commit and push changes
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add hindu-news-app/news_data.txt
+          git commit -m "Auto-update news data" || echo "No changes to commit"
+          git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/mdzaid1299/mznews.git
