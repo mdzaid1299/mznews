@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>News Website</title>
+    <link rel="icon" href="https://i.postimg.cc/bwL8LhY5/image.png" type="image/png">
+    <title>mznews</title>
     <style>
         * {
             margin: 0;
@@ -251,6 +252,111 @@
             }
         }
     </style>
+
+  
+  <style>
+    /* Only CSS needed for the news ticker */
+    .news-ticker {
+      background: linear-gradient(90deg, #d71921, #8b0000);
+      color: white;
+      padding: 8px 0;
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+    }
+    
+    .news-container {
+      display: flex;
+      align-items: center;
+      height: 12px;
+      position: relative;
+    }
+    
+    .news-label {
+      background-color: #000;
+      padding: 3px 8px;
+      font-weight: bold;
+      margin-right: 15px;
+      border-radius: 4px;
+      white-space: nowrap;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      margin-left: 10px;
+      font-size: 12px;
+      z-index: 2; /* Ensure label stays on top */
+    }
+    
+    .news-content {
+      font-size: 14px;
+      font-weight: bold;
+      white-space: nowrap;
+      animation: scroll-left 25s linear infinite;
+      padding-right: 100px;
+      position: relative;
+    }
+    
+    /* Create a gradient mask to fade out text before it reaches the label */
+    .news-container::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 120px; /* Adjust based on your label width */
+      background: linear-gradient(90deg, rgba(215,25,33,1) 60%, rgba(215,25,33,0) 100%);
+      z-index: 1;
+    }
+    
+    @keyframes scroll-left {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-120%); } /* Ensure text goes completely off-screen */
+    }
+    
+    @media (max-width: 480px) {
+      .news-content {
+        font-size: 12px;
+      }
+      .news-label {
+        font-size: 10px;
+        padding: 2px 5px;
+      }
+      .news-container::before {
+        width: 90px; /* Smaller gradient for mobile */
+      }
+    }
+  </style>
+  
+      
+      <script>
+        // Array of news items with emojis - now with more options
+        const newsItems = [
+          '🚀 Nilufa Khan Scores a Stellar 30% Hike at Trane Tech — Climbing the Corporate Ladder!',
+          '🎬 Netflix Bags mztv — Streaming Giant Expands Its Empire!',
+          '🔥 mztools Founder Exits! Joins IBM as New CTO — A Bold Career Move!',
+          '📱 Apple Launches Revolutionary AI Phone Assistant "mAi"— Tech Industry Stunned!',
+          '💰 Global Markets Hit Record High —Senior Analyst M Zaid Predict Continued Growth',
+          '🏆 mznews Startup Wins Innovation Award — Secures $10M Funding',
+          '🌐 New Quantum Computing Breakthrough — Processing Speeds Multiply',
+          '📊 Crypto Makes Surprising Comeback — Bitcoin Surges 15%'
+        ];
+        
+        // Function to select random news item
+        function getRandomNews() {
+          const randomIndex = Math.floor(Math.random() * newsItems.length);
+          return newsItems[randomIndex];
+        }
+        
+        // Set random news on page load
+        document.addEventListener('DOMContentLoaded', function() {
+          document.getElementById('news-text').textContent = getRandomNews();
+          
+          // Optional: Change news every 25 seconds (matches animation duration)
+          setInterval(() => {
+            document.getElementById('news-text').textContent = getRandomNews();
+          }, 25000);
+        });
+      </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let currentPage = 1;
@@ -310,7 +416,13 @@
 </head>
 <body>
     <!-- Header and Nav remain the same -->
-    <header class="header">
+    <div class="news-ticker">
+        <div class="news-container">
+          <div class="news-label">BREAKING NEWS</div>
+          <div class="news-content" id="news-text"></div>
+        </div>
+      </div>
+      <header class="header">
         <div class="header-left">
             <div class="menu-icon">☰</div>
             <div class="logo">THE TIMES OF INDIA</div>
@@ -320,7 +432,6 @@
             <div class="search-icon">🔍</div>
         </div>
     </header>
-    
     <nav class="nav">
         <ul class="nav-list">
             <li class="nav-item new">NEWS</li>
@@ -367,7 +478,6 @@
     
     <!-- Footer -->
     <footer class="footer">
-        <div class="social-follow">FOLLOW US ON</div>
         <div class="social-icons">
             <div class="social-icon">f</div>
             <div class="social-icon">𝕏</div>
@@ -379,6 +489,9 @@
         </div>
         <div class="footer-text">
             Copyright © 2025 Bennett, Coleman & Co. Ltd. All rights reserved. For reprint rights: Times Syndication Service
+        </div>
+        <div class="footer-text">
+mznews
         </div>
     </footer>
 </body>
