@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify, request
 
 app = Flask(__name__)
 
@@ -20,6 +20,25 @@ def load_news():
 def home():
     news = load_news()
     return render_template('index.html', news=news)
+
+@app.route('/api/more-news')
+def more_news():
+    page = int(request.args.get('page', 1))
+    news = load_news()
+    
+    # Calculate start and end indices for pagination
+    # Page 1 is already shown in the main page (items 0-9)
+    start_idx = page * 10
+    end_idx = start_idx + 10
+    
+    # Check if there are more items after this batch
+    has_more = len(news) > end_idx
+    
+    # Return the news items for this page
+    return jsonify({
+        'news': news[start_idx:end_idx] if start_idx < len(news) else [],
+        'has_more': has_more
+    })
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
