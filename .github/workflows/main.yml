@@ -28,9 +28,11 @@ jobs:
           python scrapper.py
 
       - name: Commit and push changes
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           git config --global user.name 'GitHub Actions'
-          git config --global user.email 'actions@github.com'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add hindu-news-app/news_data.txt
-          git commit -m "Auto-update news data"
-          git push
+          git commit -m "Auto-update news data" || echo "No changes to commit"
+          git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/mdzaid1299/mznews.git
