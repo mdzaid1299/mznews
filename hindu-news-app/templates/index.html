@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -67,6 +68,23 @@
             -webkit-overflow-scrolling: touch;
         }
 
+        .nav-list {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-item a {
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+        }
+
+        .nav-item a:hover {
+            color: #0056b3;
+        }
+
         .nav::-webkit-scrollbar {
             display: none;
         }
@@ -102,7 +120,7 @@
             margin-bottom: 30px;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .featured-news img {
@@ -117,7 +135,7 @@
             left: 0;
             right: 0;
             padding: 30px;
-            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
             color: white;
         }
 
@@ -144,7 +162,7 @@
 
         .news-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .news-card-image {
@@ -252,121 +270,318 @@
             }
         }
     </style>
+    <style>
+        /* Keep your existing CSS as is */
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
 
-  
-  <style>
-    /* Only CSS needed for the news ticker */
-    .news-ticker {
-      background: linear-gradient(90deg, #d71921, #8b0000);
-      color: white;
-      padding: 8px 0;
-      position: relative;
-      overflow: hidden;
-      width: 100%;
-    }
-    
-    .news-container {
-      display: flex;
-      align-items: center;
-      height: 12px;
-      position: relative;
-    }
-    
-    .news-label {
-      background-color: #000;
-      padding: 3px 8px;
-      font-weight: bold;
-      margin-right: 15px;
-      border-radius: 4px;
-      white-space: nowrap;
-      height: 22px;
-      display: flex;
-      align-items: center;
-      margin-left: 10px;
-      font-size: 12px;
-      z-index: 2; /* Ensure label stays on top */
-    }
-    
-    .news-content {
-      font-size: 14px;
-      font-weight: bold;
-      white-space: nowrap;
-      animation: scroll-left 25s linear infinite;
-      padding-right: 100px;
-      position: relative;
-    }
-    
-    /* Create a gradient mask to fade out text before it reaches the label */
-    .news-container::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 0;
-      height: 100%;
-      width: 120px; /* Adjust based on your label width */
-      background: linear-gradient(90deg, rgba(215,25,33,1) 60%, rgba(215,25,33,0) 100%);
-      z-index: 1;
-    }
-    
-    @keyframes scroll-left {
-      0% { transform: translateX(100%); }
-      100% { transform: translateX(-120%); } /* Ensure text goes completely off-screen */
-    }
-    
-    @media (max-width: 480px) {
-      .news-content {
-        font-size: 12px;
-      }
-      .news-label {
-        font-size: 10px;
-        padding: 2px 5px;
-      }
-      .news-container::before {
-        width: 90px; /* Smaller gradient for mobile */
-      }
-    }
-  </style>
-  
-      
-      <script>
+        .epaper-button {
+            background-color: white;
+            border: 1px solid #dc0000;
+            color: #dc0000;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            min-width: 140px;
+            /* Ensure consistent width for changing content */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Optional animation for smooth transitions */
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        .weather-info {
+            animation: fadeInOut 5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .weather-icon {
+            margin-right: 5px;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const weatherButton = document.getElementById('weather-button');
+
+            // Cities to show weather for
+            const cities = ["Delhi", "Mumbai", "Kolkata", "Chennai"];
+            let currentCityIndex = 0;
+            let weatherData = {};
+
+            // Weather condition icons mapping
+            const weatherIcons = {
+                'Clear': '☀️',
+                'Clouds': '☁️',
+                'Rain': '🌧️',
+                'Drizzle': '🌦️',
+                'Thunderstorm': '⛈️',
+                'Snow': '❄️',
+                'Mist': '🌫️',
+                'Smoke': '🌫️',
+                'Haze': '🌫️',
+                'Dust': '🌫️',
+                'Fog': '🌫️',
+                'Sand': '🌫️',
+                'Ash': '🌫️',
+                'Squall': '💨',
+                'Tornado': '🌪️'
+            };
+
+            // Check if we have stored weather data and when it was last updated
+            function loadStoredWeatherData() {
+                const storedData = localStorage.getItem('weatherData');
+                const lastUpdate = localStorage.getItem('weatherLastUpdate');
+
+                if (storedData && lastUpdate) {
+                    const lastUpdateTime = new Date(lastUpdate).getTime();
+                    const currentTime = new Date().getTime();
+                    const hoursSinceLastUpdate = (currentTime - lastUpdateTime) / (1000 * 60 * 60);
+
+                    // If data is less than 24 hours old, use it
+                    if (hoursSinceLastUpdate < 24) {
+                        weatherData = JSON.parse(storedData);
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            // Save weather data to localStorage
+            function saveWeatherData() {
+                localStorage.setItem('weatherData', JSON.stringify(weatherData));
+                localStorage.setItem('weatherLastUpdate', new Date().toISOString());
+            }
+
+            // Function to fetch weather data (only called once per day)
+            async function fetchWeatherData() {
+                // First try to load from storage
+                if (loadStoredWeatherData()) {
+                    console.log("Using cached weather data");
+                    startWeatherDisplay();
+                    return;
+                }
+
+                console.log("Fetching fresh weather data");
+                const apiKey = "50d93331f8cdeb7e4815ec28fbdac298"; // Free tier OpenWeatherMap API key
+
+                // Create fallback data in case API fails
+                cities.forEach(city => {
+                    weatherData[city] = {
+                        temp: Math.round(20 + Math.random() * 15) + "°C",
+                        condition: "Clear",
+                        icon: "☀️"
+                    };
+                });
+
+                try {
+                    // Use Promise.all to fetch all city data at once
+                    const promises = cities.map(city =>
+                        fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city},in&units=metric&appid=${apiKey}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.cod === 200) {
+                                    weatherData[city] = {
+                                        temp: Math.round(data.main.temp) + "°C",
+                                        condition: data.weather[0].main,
+                                        icon: weatherIcons[data.weather[0].main] || '🌡️'
+                                    };
+                                }
+                            })
+                            .catch(error => console.error(`Error fetching weather for ${city}:`, error))
+                    );
+
+                    // Wait for all API calls to complete
+                    await Promise.all(promises);
+
+                    // Save to localStorage for future use
+                    saveWeatherData();
+                } catch (error) {
+                    console.error("Error fetching weather data:", error);
+                }
+
+                // Start displaying weather data
+                startWeatherDisplay();
+            }
+
+            // Function to start weather display cycle
+            function startWeatherDisplay() {
+                updateWeather();
+                setInterval(updateWeather, 5000);
+            }
+
+            // Function to update weather display
+            function updateWeather() {
+                const city = cities[currentCityIndex];
+                const weather = weatherData[city];
+
+                if (!weather) return;
+
+                // Update the button content
+                weatherButton.innerHTML = `
+              <div class="weather-info">
+                <span class="weather-icon">${weather.icon}</span> ${city}: ${weather.temp}
+              </div>
+            `;
+
+                // Update index for next weather
+                currentCityIndex = (currentCityIndex + 1) % cities.length;
+            }
+
+            // Fetch weather data once when page loads
+            fetchWeatherData();
+        });
+    </script>
+
+    <style>
+        /* Only CSS needed for the news ticker */
+        .news-ticker {
+            background: linear-gradient(90deg, #d71921, #8b0000);
+            color: white;
+            padding: 8px 0;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .news-container {
+            display: flex;
+            align-items: center;
+            height: 12px;
+            position: relative;
+        }
+
+        .news-label {
+            background-color: #000;
+            padding: 3px 8px;
+            font-weight: bold;
+            margin-right: 15px;
+            border-radius: 4px;
+            white-space: nowrap;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            margin-left: 10px;
+            font-size: 12px;
+            z-index: 2;
+            /* Ensure label stays on top */
+        }
+
+        .news-content {
+            font-size: 14px;
+            font-weight: bold;
+            white-space: nowrap;
+            animation: scroll-left 25s linear infinite;
+            padding-right: 100px;
+            position: relative;
+        }
+
+        /* Create a gradient mask to fade out text before it reaches the label */
+        .news-container::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 120px;
+            /* Adjust based on your label width */
+            background: linear-gradient(90deg, rgba(215, 25, 33, 1) 60%, rgba(215, 25, 33, 0) 100%);
+            z-index: 1;
+        }
+
+        @keyframes scroll-left {
+            0% {
+                transform: translateX(100%);
+            }
+
+            100% {
+                transform: translateX(-120%);
+            }
+
+            /* Ensure text goes completely off-screen */
+        }
+
+        @media (max-width: 480px) {
+            .news-content {
+                font-size: 12px;
+            }
+
+            .news-label {
+                font-size: 10px;
+                padding: 2px 5px;
+            }
+
+            .news-container::before {
+                width: 90px;
+                /* Smaller gradient for mobile */
+            }
+        }
+    </style>
+
+
+    <script>
         // Array of news items with emojis - now with more options
         const newsItems = [
-          '🚀 Nilufa Khan Scores a Stellar 30% Hike at Trane Tech — Climbing the Corporate Ladder!',
-          '🎬 Netflix Bags mztv — Streaming Giant Expands Its Empire!',
-          '🔥 mztools Founder Exits! Joins IBM as New CTO — A Bold Career Move!',
-          '📱 Apple Launches Revolutionary AI Phone Assistant "mAi"— Tech Industry Stunned!',
-          '💰 Global Markets Hit Record High —Senior Analyst M Zaid Predict Continued Growth',
-          '🏆 mznews Startup Wins Innovation Award — Secures $10M Funding',
-          '🌐 New Quantum Computing Breakthrough — Processing Speeds Multiply',
-          '📊 Crypto Makes Surprising Comeback — Bitcoin Surges 15%'
+            '🚀 Nilufa Khan Scores a Stellar 30% Hike at Trane Tech — Climbing the Corporate Ladder!',
+            '🎬 Netflix Bags mztv — Streaming Giant Expands Its Empire!',
+            '🔥 mztools Founder Exits! Joins IBM as New CTO — A Bold Career Move!',
+            '📱 Apple Launches Revolutionary AI Phone Assistant "mAi"— Tech Industry Stunned!',
+            '💰 Global Markets Hit Record High —Senior Analyst M Zaid Predict Continued Growth',
+            '🏆 mznews Startup Wins Innovation Award — Secures $10M Funding',
+            '🌐 New Quantum Computing Breakthrough — Processing Speeds Multiply',
+            '📊 Crypto Makes Surprising Comeback — Bitcoin Surges 15%'
         ];
-        
+
         // Function to select random news item
         function getRandomNews() {
-          const randomIndex = Math.floor(Math.random() * newsItems.length);
-          return newsItems[randomIndex];
+            const randomIndex = Math.floor(Math.random() * newsItems.length);
+            return newsItems[randomIndex];
         }
-        
+
         // Set random news on page load
-        document.addEventListener('DOMContentLoaded', function() {
-          document.getElementById('news-text').textContent = getRandomNews();
-          
-          // Optional: Change news every 25 seconds (matches animation duration)
-          setInterval(() => {
+        document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('news-text').textContent = getRandomNews();
-          }, 25000);
+
+            // Optional: Change news every 25 seconds (matches animation duration)
+            setInterval(() => {
+                document.getElementById('news-text').textContent = getRandomNews();
+            }, 25000);
         });
-      </script>
+    </script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             let currentPage = 1;
             const loadMoreButton = document.querySelector('.load-more');
-            
+
             if (loadMoreButton) {
-                loadMoreButton.addEventListener('click', function() {
+                loadMoreButton.addEventListener('click', function () {
                     // Increment the page number
                     currentPage++;
-                    
+
                     // Fetch more news
                     fetch(`/api/more-news?page=${currentPage}`)
                         .then(response => response.json())
@@ -374,15 +589,15 @@
                             if (data.news.length > 0) {
                                 // Get the news grid
                                 const newsGrid = document.querySelector('.news-grid');
-                                
+
                                 // Add new news items to the grid
                                 data.news.forEach(item => {
                                     const [title, link, img_url] = item;
-                                    
+
                                     // Create a new news card
                                     const newsCard = document.createElement('div');
                                     newsCard.className = 'news-card';
-                                    
+
                                     // Set the HTML for the news card
                                     newsCard.innerHTML = `
                                         <a href="${link}">
@@ -392,11 +607,11 @@
                                             </div>
                                         </a>
                                     `;
-                                    
+
                                     // Add the card to the grid
                                     newsGrid.appendChild(newsCard);
                                 });
-                                
+
                                 // Hide the load more button if there are no more news items
                                 if (!data.has_more) {
                                     loadMoreButton.style.display = 'none';
@@ -414,37 +629,41 @@
         });
     </script>
 </head>
+
 <body>
     <!-- Header and Nav remain the same -->
     <div class="news-ticker">
         <div class="news-container">
-          <div class="news-label">BREAKING NEWS</div>
-          <div class="news-content" id="news-text"></div>
+            <div class="news-label">BREAKING NEWS</div>
+            <div class="news-content" id="news-text"></div>
         </div>
-      </div>
-      <header class="header">
+    </div>
+    <header class="header">
         <div class="header-left">
             <div class="menu-icon">☰</div>
             <div class="logo">THE TIMES OF INDIA</div>
         </div>
         <div class="header-right">
-            <button class="epaper-button">Read ePaper</button>
-            <div class="search-icon">🔍</div>
+            <button class="epaper-button" id="weather-button">
+                <div class="weather-info">Loading...</div>
+            </button>
+            <div class="search-icon">🖥️</div>
         </div>
     </header>
     <nav class="nav">
         <ul class="nav-list">
-            <li class="nav-item new">NEWS</li>
-            <li class="nav-item">TOI GAMES</li>
-            <li class="nav-item">WORLD</li>
-            <li class="nav-item">CITY</li>
-            <li class="nav-item">INDIA</li>
-            <li class="nav-item">BUSINESS</li>
-            <li class="nav-item">TECH</li>
-            <li class="nav-item">SPORTS</li>
+            <li class="nav-item new"><a href="https://timesofindia.indiatimes.com/news" target="_blank">NEWS</a></li>
+            <li class="nav-item"><a href="https://timesofindia.indiatimes.com/games" target="_blank">TOI GAMES</a></li>
+            <li class="nav-item"><a href="https://timesofindia.indiatimes.com/world" target="_blank">WORLD</a></li>
+            <li class="nav-item"><a href="https://timesofindia.indiatimes.com/city" target="_blank">CITY</a></li>
+            <li class="nav-item"><a href="https://timesofindia.indiatimes.com/india" target="_blank">INDIA</a></li>
+            <li class="nav-item"><a href="https://timesofindia.indiatimes.com/business" target="_blank">BUSINESS</a>
+            </li>
+            <li class="nav-item"><a href="https://timesofindia.indiatimes.com/tech" target="_blank">TECH</a></li>
+            <li class="nav-item"><a href="https://timesofindia.indiatimes.com/sports" target="_blank">SPORTS</a></li>
         </ul>
     </nav>
-    
+
     <div class="container">
         <!-- Featured News -->
         <div class="featured-news">
@@ -453,7 +672,7 @@
                 <h2><a href="{{ news[0][1] }}" style="color: white; text-decoration: none;">{{ news[0][0] }}</a></h2>
             </div>
         </div>
-        
+
         <!-- News Grid -->
         <div class="news-grid">
             {% for title, link, img_url in news[1:10] %}
@@ -467,7 +686,7 @@
             </div>
             {% endfor %}
         </div>
-        
+
         <!-- Pagination -->
         {% if news|length > 10 %}
         <div class="pagination">
@@ -475,7 +694,7 @@
         </div>
         {% endif %}
     </div>
-    
+
     <!-- Footer -->
     <footer class="footer">
         <div class="social-icons">
@@ -488,10 +707,11 @@
             <div class="social-icon">W</div>
         </div>
         <div class="footer-text">
-            Copyright © 2025 Bennett, Coleman & Co. Ltd. All rights reserved. For reprint rights: Times Syndication Service
+            Copyright © 2025 Bennett, Coleman & Co. Ltd. All rights reserved. For reprint rights: Times Syndication
+            Service
         </div>
         <div class="footer-text">
-mznews
+            mznews
         </div>
     </footer>
 </body>
