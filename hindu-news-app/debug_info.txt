@@ -1,4 +1,4 @@
 Status code: 200
-Content length: 1127820
-Articles found: 174
-News items extracted: 164
+Content length: 638985
+Articles found: 117
+News items extracted: 109
