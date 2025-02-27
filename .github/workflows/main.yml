@@ -25,7 +25,7 @@ jobs:
       - name: Run scraper
         run: |
           cd hindu-news-app
-          python scraper.py
+          python scrapper.py
 
       - name: Commit and push changes
         run: |
