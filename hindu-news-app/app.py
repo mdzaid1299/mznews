@@ -1,42 +1,39 @@
 import os
 from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
+from dotenv import load_dotenv
+from supabase import create_client, Client
+
+# Load environment variables
+load_dotenv()
+
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 app = Flask(__name__)
-CORS(app) 
+CORS(app)
 
 def load_news():
-    try:
-        with open("news_data.txt", "r", encoding="utf-8") as file:
-            news = []
-            for line in file.readlines():
-                parts = line.strip().split(' - ')
-                if len(parts) == 3:
-                    title, link, img_url = parts
-                    news.append((title, link, img_url))
-            return news
-    except FileNotFoundError:
-        return []
+    response = supabase.table("news").select("*").order("created_at", desc=True).execute()
+    data = response.data
+    return [(item["title"], item["link"], item["image_url"]) for item in data]
 
 @app.route('/')
 def home():
-    news = load_news()
+    news = load_news()[:10]  # Load only first 10 items for homepage
     return render_template('index.html', news=news)
 
 @app.route('/api/more-news')
 def more_news():
     page = int(request.args.get('page', 1))
     news = load_news()
-    
-    # Calculate start and end indices for pagination
-    # Page 1 is already shown in the main page (items 0-9)
+
+    # Pagination logic: 10 items per page
     start_idx = page * 10
     end_idx = start_idx + 10
-    
-    # Check if there are more items after this batch
     has_more = len(news) > end_idx
-    
-    # Return the news items for this page
+
     return jsonify({
         'news': news[start_idx:end_idx] if start_idx < len(news) else [],
         'has_more': has_more
