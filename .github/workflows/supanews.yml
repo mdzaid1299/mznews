@@ -1,0 +1,36 @@
+name: MNews Supa
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs every day at midnight UTC
+  workflow_dispatch:  # Allows manual runs
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r hindu-news-app/requirements.txt
+
+      - name: Install Playwright Browsers
+        run: |
+          python -m playwright install
+
+      - name: Run Scraper
+        run: |
+          cd hindu-news-app
+          python scrapper.py
